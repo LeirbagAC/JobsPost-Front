@@ -1,0 +1,94 @@
+/* Container base do card (bordas e hover já são feitos pelo antd) */
+.cardContainer {
+  width: 100%;
+  border-color: #e5e7eb;
+}
+
+/* Área superior (Logo, Títulos e Salário) */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.companyInfo {
+  display: flex;
+  gap: 16px;
+}
+
+.logoPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.urgentTag {
+  margin: 0;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.salaryArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Área inferior (Tags e Botão de Detalhes) */
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tagsContainer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.customTag {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border-radius: 16px !important;
+  padding: 2px 12px !important;
+  font-weight: 500;
+  font-size: 13px;
+  margin-inline-end: 0 !important; /* Remove margem extra do Antd */
+}
+
+.detailsBtn {
+  font-weight: 600;
+  color: #374151;
+}
+
+@media (max-width: 576px) {
+  .cardHeader {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .cardFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .detailsBtn {
+    width: 100%;
+  }
+}

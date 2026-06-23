@@ -1,0 +1,5 @@
+export const DEFAULT_COLOR = '#007bff';
+export const BACKGROUND_COLOR_SURFACE = '#F5F6F8';
+export const PLACEHOLDER_TEXT_COLOR = '#898989';
+export const BORDER_INPUT_COLOR = '#191919';
+export const COLOR_PRIMARY = DEFAULT_COLOR;

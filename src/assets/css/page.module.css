@@ -1,0 +1,245 @@
+/* FUNDO E LAYOUT GERAL */
+.pageWrapper {
+  background-color: var(--background);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 64px 24px;
+}
+
+.iconMuted {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+/* HEADER SUPERIOR */
+.header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 24px;
+  margin-bottom: 40px;
+}
+
+.headerContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.headerSearch {
+  background-color: #f4f7f9;
+  border-radius: 6px;
+  width: 240px;
+}
+
+.headerNav {
+  display: flex;
+  gap: 24px;
+  margin-left: 24px;
+  height: 100%;
+}
+
+.navLink, .navLinkActive {
+  text-decoration: none;
+  color: #4b5563;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border-bottom: 2px solid transparent;
+}
+
+.navLinkActive {
+  color: #1677ff;
+  border-bottom-color: #1677ff;
+}
+
+.headerActions {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+}
+
+/* .signInBtn {
+  
+} */
+
+/* TÍTULO E BUSCA PRINCIPAL */
+.pageHeader {
+  margin-bottom: 32px;
+}
+
+.heroSearch {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 8px 8px 16px;
+  margin-bottom: 40px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.searchInput {
+  flex: 1;
+}
+
+.searchButton {
+  border-radius: 8px;
+  padding: 0 32px;
+  font-weight: 600;
+}
+
+/* GRID PRINCIPAL (FILTROS + VAGAS) */
+.contentGrid {
+  display: grid;
+  grid-template-columns:1fr;
+  gap: 40px;
+  align-items: flex-start;
+  min-height: 60vh; /* Garante que a grid ocupe pelo menos a altura da tela */
+}
+
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Ajusta a cor do texto do checkbox para ficar mais leve igual a imagem */
+.checkboxGroup span:last-child {
+  color: #4b5563;
+}
+
+.seeMoreBtn {
+  text-align: left;
+  padding: 0;
+  margin-top: 12px;
+  width: fit-content;
+}
+
+/* LISTA DE VAGAS */
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.cardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* JOB CARD Fiel ao antd e imagem */
+.jobCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+
+.jobCard:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.companyInfo {
+  display: flex;
+  gap: 16px;
+}
+
+.logoPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.salaryArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tagsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+/* Customização da Tag para ficar redondinha e azul clara */
+.customTag {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border-radius: 16px !important;
+  padding: 2px 12px !important;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.detailsBtn {
+  border-radius: 6px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.paginationArea {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+  .heroSearch {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+  .searchButton {
+    width: 100%;
+  }
+}

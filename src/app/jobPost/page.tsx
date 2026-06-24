@@ -3,15 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Card, Form, Input, Button, Select, Switch, Typography, Divider, Row, Col, message 
+  Card, Form, Input, Button, Select, Typography, Divider, message, 
+  InputNumber
 } from 'antd';
 import { 
   ArrowLeftOutlined, 
-  BankOutlined, 
-  EnvironmentOutlined, 
-  DollarOutlined 
 } from '@ant-design/icons';
 import styles from '@/assets/css/JobPost.module.css';
+import { postJob, JobFormValues } from '@/service/JobsPost.service';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -19,16 +18,14 @@ const { TextArea } = Input;
 export default function PostJobPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<JobFormValues>();
 
-  const onFinish = async (values: any) => {
+  const handlePost = async (values: JobFormValues) => {
     setLoading(true);
     try {
-      console.log('Payload para a API:', values);
-      //Para chamr os dados da api
-
+      await postJob(values);
       message.success('Vaga publicada com sucesso!');
-      router.push('/'); 
+      router.push('/');
     } catch (error) {
       message.error('Erro ao publicar a vaga. Tente novamente.');
     } finally {
@@ -52,7 +49,7 @@ export default function PostJobPage() {
 
         <Card 
           className={styles.formCard} 
-          bordered={false}
+          variant="borderless"
           styles={{ body: { padding: '40px' } }}
         >
           <div className={styles.header}>
@@ -65,8 +62,8 @@ export default function PostJobPage() {
           <Form
             form={form}
             layout="vertical"
-            onFinish={onFinish}
-            requiredMark={false} // Remove aquele asterisco vermelho padrão, deixando mais clean
+            onFinish={handlePost}
+            requiredMark={false} 
             size="large"
           >
             <Form.Item
@@ -77,7 +74,25 @@ export default function PostJobPage() {
               <Input placeholder="Ex: Desenvolvedor Front-end Sênior (React)" />
             </Form.Item>
 
-            <Row gutter={24}>
+            <Form.Item
+              name="postTechStack"
+              label={<Text strong>Tecnologias</Text>}
+            >
+              <Select
+                mode="tags"
+                placeholder="Digite a tecnologia e pressione Enter"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={<Text strong>Experiência (anos)</Text>}
+              name="reqExperience"
+            >
+              <InputNumber placeholder="Digite a experiência necessária" min={0} max={60} style={{ width: '100%' }} />
+            </Form.Item>
+
+            {/* Para futura implementação */}
+            {/* <Row gutter={24}>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="company"
@@ -97,9 +112,9 @@ export default function PostJobPage() {
                   <Input prefix={<EnvironmentOutlined className={styles.iconMuted} />} placeholder="Ex: São Paulo, SP ou 100% Remoto" />
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> */}
 
-            <Row gutter={24}>
+            {/* <Row gutter={24}>
               <Col xs={24} md={12}>
                 <Form.Item
                   name="modality"
@@ -122,7 +137,7 @@ export default function PostJobPage() {
                   <Input prefix={<DollarOutlined className={styles.iconMuted} />} placeholder="Ex: R$ 12.000 - R$ 16.000" />
                 </Form.Item>
               </Col>
-            </Row>
+            </Row> */}
 
             <Form.Item
               name="description"

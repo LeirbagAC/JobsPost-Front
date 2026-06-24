@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Button, Input, Tag, Pagination, Typography, message 
+  Button, Input, Pagination, Typography, message 
 } from 'antd';
 import { 
   SearchOutlined, AppstoreFilled 
@@ -19,7 +19,13 @@ export default function MuralDeVagas() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState<JobPost[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const pageSize = 10;
+  const paginatedJobs = jobs.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+  );
 
   const fetchJobs = async() => {
     try {
@@ -101,14 +107,19 @@ export default function MuralDeVagas() {
               ) : jobs.length === 0 ? (
                 <Text>Nenhuma vaga encontrada.</Text>
               ) : (
-                jobs.map(job => (
+                paginatedJobs.map(job => (
                   <JobCard key={job.postId} job={job} />
                 ))
               )}
             </div>
             
             <div className={styles.paginationArea}>
-              <Pagination defaultCurrent={1} total={jobs.length} showSizeChanger={false} />
+              <Pagination defaultCurrent={currentPage} 
+              total={jobs.length} 
+              showSizeChanger={false} 
+              pageSize={10} 
+              onChange={(page) => setCurrentPage(page)} 
+              />
             </div>
           </section>
         </div>

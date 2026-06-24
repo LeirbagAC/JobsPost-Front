@@ -179,7 +179,7 @@ const onFinishLogin = async (values: any) => {
 
       <Card 
         className={styles.authCard} 
-        bordered={false}
+        variant="borderless"
         styles={{ body: { padding: '32px 40px' } }}
       >
         <div className={styles.welcomeText}>

@@ -11,6 +11,7 @@ import {
 import styles from '@/assets/css/page.module.css';
 import { getJobs } from '@/service/getJobs.service';
 import { JobPost } from '@/types';
+import JobCard from '@/ui/JobCard';
 
 const { Title, Text } = Typography;
 
@@ -50,7 +51,7 @@ export default function MuralDeVagas() {
             prefix={<SearchOutlined className={styles.iconMuted} />} 
             placeholder="Pesquisar vagas..." 
             className={styles.headerSearch}
-            bordered={false}
+            variant="borderless"
           />
 
           <div className={styles.headerActions}>
@@ -93,40 +94,15 @@ export default function MuralDeVagas() {
               </div>
             </div>
 
+            {/* JOBCARDS */}
             <div className={styles.cardsContainer}>
               {loading ? (
                 <Text>Carregando vagas...</Text>
               ) : jobs.length === 0 ? (
                 <Text>Nenhuma vaga encontrada.</Text>
               ) : (
-                jobs.map((job) => (
-                  <div key={job.postId} className={styles.jobCard}>
-                    <div className={styles.cardHeader}>
-                      <div className={styles.companyInfo}>
-                        <div className={styles.logoPlaceholder}>
-                          <AppstoreFilled style={{ color: '#1677ff', fontSize: '20px' }} />
-                        </div>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Title level={5} style={{ margin: 0 }}>{job.postProfile}</Title>
-                          </div>
-                          <Text type="secondary" style={{ fontSize: '14px' }}>
-                            Experiência requerida: {job.reqExperience} anos
-                          </Text>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={styles.cardFooter}>
-                      <div className={styles.tagsContainer}>
-                        {job.postTechStack.map((tech, index) => (
-                          <Tag key={index} className={styles.customTag} bordered={false}>
-                            {tech}
-                          </Tag>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                jobs.map(job => (
+                  <JobCard key={job.postId} job={job} />
                 ))
               )}
             </div>

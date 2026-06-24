@@ -11,7 +11,6 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   let basicToken: string | null = null;
-
   try {
     const raw = localStorage.getItem('@jobpost:user');
     if (raw) {

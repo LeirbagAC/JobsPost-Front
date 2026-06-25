@@ -1,16 +1,17 @@
 import React from 'react';
 import { JobPost } from '@/types';
-import { Typography, Tag } from 'antd';
+import { Typography, Tag, Button } from 'antd';
 import styles from '@/assets/css/page.module.css';
-import { AppstoreFilled } from '@ant-design/icons';
+import { AppstoreFilled, DeleteOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
 interface JobCardProps {
   job: JobPost;
+  handleDelete: (jobId: number) => void;
 }
 
-export default function JobCard({ job }: JobCardProps) {
+export default function JobCard({ job, handleDelete }: JobCardProps) {
   return (
     <div className={styles.jobCard}>
       <div className={styles.cardHeader}>
@@ -27,6 +28,12 @@ export default function JobCard({ job }: JobCardProps) {
             </Text>
           </div>
         </div>
+          <Button
+          type="text"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(job.postId)}
+          />
       </div>
 
       <div className={styles.cardFooter}>

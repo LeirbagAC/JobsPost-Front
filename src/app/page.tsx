@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import styles from '@/assets/css/page.module.css';
 import { getJobs } from '@/service/getJobs.service';
+import { deleteJob } from '@/service/deleteJob.service';
 import { JobPost } from '@/types';
 import JobCard from '@/ui/JobCard';
 
@@ -37,7 +38,18 @@ export default function MuralDeVagas() {
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleDelete = async(jobId: number) => {
+    try {
+      await deleteJob(jobId);
+      message.success("Vaga deletada com sucesso.");
+      fetchJobs(); 
+
+    } catch (err) {
+      message.error("Erro ao deletar a vaga.");
+    }
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -108,7 +120,7 @@ export default function MuralDeVagas() {
                 <Text>Nenhuma vaga encontrada.</Text>
               ) : (
                 paginatedJobs.map(job => (
-                  <JobCard key={job.postId} job={job} />
+                  <JobCard key={job.postId} job={job} handleDelete={handleDelete}/>
                 ))
               )}
             </div>

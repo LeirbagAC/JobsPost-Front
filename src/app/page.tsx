@@ -13,6 +13,7 @@ import { getJobs } from '@/service/getJobs.service';
 import { deleteJob } from '@/service/deleteJob.service';
 import { JobPost } from '@/types';
 import JobCard from '@/ui/JobCard';
+import { search } from '@/service/search.service';
 
 const { Title, Text } = Typography;
 
@@ -21,6 +22,7 @@ export default function MuralDeVagas() {
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const pageSize = 10;
   const paginatedJobs = jobs.slice(
@@ -48,6 +50,24 @@ export default function MuralDeVagas() {
 
     } catch (err) {
       message.error("Erro ao deletar a vaga.");
+    }
+  };
+
+  const handleSearch = async(query: string) => {
+    if(!query.trim()) {
+      fetchJobs();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await search(query);
+      setJobs(data);
+
+    } catch (err) {
+      message.error("Erro ao buscar vagas.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,12 +112,15 @@ export default function MuralDeVagas() {
         <section className={styles.heroSearch}>
           <Input 
             prefix={<SearchOutlined className={styles.iconMuted} />} 
-            placeholder="Cargo, habilidade ou empresa" 
-            bordered={false} 
+            placeholder="Cargo, habilidade ou tecnologia..." 
+            variant='borderless' 
             size="large"
             className={styles.searchInput}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onPressEnter={() => handleSearch(searchQuery)}
           />
-          <Button type="primary" size="large" className={styles.searchButton}>
+          <Button type="primary" size="large" className={styles.searchButton} onClick={() => handleSearch(searchQuery)}>
             Buscar Vagas
           </Button>
         </section>

@@ -35,7 +35,7 @@ export default function MuralDeVagas() {
       setLoading(true);
       const data = await getJobs();
       setJobs(data);
-    } catch (err) {
+    } catch {
       message.error("Erro ao carregar as vagas.");
     } finally {
       setLoading(false);
@@ -48,7 +48,7 @@ export default function MuralDeVagas() {
       message.success("Vaga deletada com sucesso.");
       fetchJobs(); 
 
-    } catch (err) {
+    } catch {
       message.error("Erro ao deletar a vaga.");
     }
   };
@@ -64,11 +64,15 @@ export default function MuralDeVagas() {
       const data = await search(query);
       setJobs(data);
 
-    } catch (err) {
+    } catch {
       message.error("Erro ao buscar vagas.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (postId: number) => {
+    router.push(`/jobPost?postId=${postId}`);
   };
 
   useEffect(() => {
@@ -94,7 +98,7 @@ export default function MuralDeVagas() {
 
           <div className={styles.headerActions}>
             <Button type="primary" onClick={() => router.push('/login')} className={styles.signInBtn}>Entrar</Button>
-            <Button type="default" onClick={() => router.push('/jobPost')} >Post a Job</Button>
+            <Button type="default" onClick={() => router.push('/jobPost')} >Postar um Trabalho</Button>
           </div>
         </div>
       </header>
@@ -143,7 +147,7 @@ export default function MuralDeVagas() {
                 <Text>Nenhuma vaga encontrada.</Text>
               ) : (
                 paginatedJobs.map(job => (
-                  <JobCard key={job.postId} job={job} handleDelete={handleDelete}/>
+                  <JobCard key={job.postId} job={job} handleDelete={handleDelete} handleEdit={handleEdit}/>
                 ))
               )}
             </div>

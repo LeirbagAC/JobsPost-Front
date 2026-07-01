@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JobsPost - Frontend
 
-## Getting Started
+[![Backend: Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot-6DB33F?style=for-the-badge&logo=Spring)](https://github.com/LeirbagAC/spring-boot-rest)
 
-First, run the development server:
+Uma aplicação web desenvolvida para listar, visualizar e gerenciar vagas de emprego. Este repositório contém o frontend da aplicação, construído para se comunicar com uma API RESTful.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Tecnologias Utilizadas
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+O projeto foi construído utilizando as seguintes ferramentas:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* **Next.js (16.2.9)** e **React (19.2.4)**
+* **TypeScript** para tipagem estática e maior segurança no desenvolvimento
+* **Ant Design (antd 6.4.4)** para componentes de interface e design system
+* **Axios** para consumo da API
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚙️ Funcionalidades
 
-## Learn More
+* **Listagem de Vagas:** Exibição de postagens detalhando o perfil da vaga, tempo de experiência requerido, descrição e tecnologias utilizadas (tech stack).
+* **Gerenciamento:** Opções diretas na interface para edição e exclusão de vagas específicas.
+* **Autenticação Integrada:** Interceptação de requisições configurada para adicionar automaticamente o token de autenticação (Basic Auth) armazenado no `localStorage`.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Próximos Passos (Roadmap)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* **Implementação do React Query (TanStack Query):** Refatorar o gerenciamento de estados assíncronos e requisições à API para melhorar o cache, o controle de loading e a performance geral da aplicação.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🏃‍♂️ Como executar o projeto localmente
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  Clone este repositório.
+2.  Instale as dependências:
+    ```bash
+    npm install
+    # ou
+    yarn install
+    ```
+3.  Crie um arquivo `.env.local` na raiz do projeto contendo a URL da sua API backend em execução:
+    ```env
+    NEXT_PUBLIC_API_URL=http://localhost:8080 # Substitua pela rota correta
+    ```
+    *(Nota: A configuração do Axios depende dessa variável para definir a `baseURL` de todas as chamadas HTTP)*.
+4.  Inicie o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    # ou
+    yarn dev
+    ```
+5.  Acesse `http://localhost:3000` no seu navegador para ver o resultado.

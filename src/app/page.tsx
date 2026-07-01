@@ -23,6 +23,7 @@ export default function MuralDeVagas() {
   const [jobs, setJobs] = useState<JobPost[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const pageSize = 10;
   const paginatedJobs = jobs.slice(
@@ -30,6 +31,7 @@ export default function MuralDeVagas() {
   currentPage * pageSize
   );
 
+  //Estudar sobre react Query e SWR para refatorar e não ter mais necessidade de você criar manualmente os estados de loading, o array vazio inicial ([]), os blocos de try/catch e o useEffect
   const fetchJobs = async() => {
     try {
       setLoading(true);
@@ -43,6 +45,11 @@ export default function MuralDeVagas() {
   };
 
   const handleDelete = async(jobId: number) => {
+    if(!isLoggedIn) {
+      message.warning("Você precisa estar logado para deletar uma vaga.");
+      return;
+    }
+
     try {
       await deleteJob(jobId);
       message.success("Vaga deletada com sucesso.");
@@ -71,11 +78,27 @@ export default function MuralDeVagas() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('@jobpost:user');
+    setIsLoggedIn(false);
+    router.push('/');
+  };
+
   const handleEdit = (postId: number) => {
+     if(!isLoggedIn) {
+      message.warning("Você precisa estar logado para editar uma vaga.");
+      return;
+    }
+    
     router.push(`/jobPost?postId=${postId}`);
   };
 
   useEffect(() => {
+    const userData = localStorage.getItem('@jobpost:user');
+    if(userData) {
+      setIsLoggedIn(true);
+    }
+
     fetchJobs();
   }, []);
 
@@ -88,17 +111,22 @@ export default function MuralDeVagas() {
             <AppstoreFilled style={{ fontSize: '24px', color: '#1677ff' }} />
             <span className={styles.logoText}>HireStream</span>
           </div>
-          
-          <Input 
-            prefix={<SearchOutlined className={styles.iconMuted} />} 
-            placeholder="Pesquisar vagas..." 
-            className={styles.headerSearch}
-            variant="borderless"
-          />
 
           <div className={styles.headerActions}>
-            <Button type="primary" onClick={() => router.push('/login')} className={styles.signInBtn}>Entrar</Button>
-            <Button type="default" onClick={() => router.push('/jobPost')} >Postar um Trabalho</Button>
+            {isLoggedIn ? (
+              <>
+                <Button type="default" onClick={() => router.push('/jobPost')}>
+                  Postar um Trabalho
+                </Button>
+                <Button type="primary" onClick={handleLogout}>
+                  Sair
+                </Button>
+              </>
+            ) : (
+              <Button type="primary" onClick={() => router.push('/login')} className={styles.signInBtn}>
+                Entrar
+              </Button>
+            )}
           </div>
         </div>
       </header>

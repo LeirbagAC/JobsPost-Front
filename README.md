@@ -1,8 +1,14 @@
 # JobsPost - Frontend
 
-[![Backend: Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot-6DB33F?style=for-the-badge&logo=Spring)](https://github.com/LeirbagAC/spring-boot-rest)
-
 Uma aplicação web desenvolvida para listar, visualizar e gerenciar vagas de emprego. Este repositório contém o frontend da aplicação, construído para se comunicar com uma API RESTful.
+
+## 🔗 Repositório da API (Backend)
+
+Este frontend consome uma API RESTful dedicada, desenvolvida em Spring Boot. Para que a aplicação funcione completamente no seu ambiente local, é necessário rodar a API em conjunto.
+
+Você pode encontrar o código-fonte, a arquitetura e as instruções de inicialização do backend no link abaixo:
+
+* [**Acessar repositório do Backend (Spring Boot)**](https://github.com/LeirbagAC/spring-boot-rest)
 
 ## 🚀 Tecnologias Utilizadas
 

@@ -9,21 +9,48 @@ import {
   SearchOutlined, AppstoreFilled 
 } from '@ant-design/icons';
 import styles from '@/assets/css/page.module.css';
+
 import { getJobs } from '@/service/getJobs.service';
 import { deleteJob } from '@/service/deleteJob.service';
 import { JobPost } from '@/types';
 import JobCard from '@/ui/JobCard';
 import { search } from '@/service/search.service';
 
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+
 const { Title, Text } = Typography;
 
 export default function MuralDeVagas() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [jobs, setJobs] = useState<JobPost[]>([]);
+  const queryClient = useQueryClient();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  //Coloquei os [] para não dá o erro de "Cannot read properies of undefined" por conta do jobs.length e jobs.map(). 
+  //Quando o componente é montado pela primeira vez, o React Query dispara a requisição e a resposta ainda não chegou.
+  //Nesse milissegundo (ou segundos), o valor de data é undefined
+  const { data: jobs = [], isLoading, isError } = useQuery<JobPost[]>({
+    queryKey: ['jobs', activeSearch],
+    queryFn: () => activeSearch ? search(activeSearch) : getJobs(),
+  }); 
+
+  useEffect(() => {
+    if(isError) message.error("Erro ao carregar as vagas.");
+  }, [isError]);
+
+  const deleteMutation = useMutation({
+    mutationFn: (jobId: number) => deleteJob(jobId),
+    onSuccess: () => {
+      message.success("Vaga deletada com sucesso.");
+      return queryClient.invalidateQueries({ queryKey: ['jobs'] })
+    },
+    onError: () => {
+      message.success("Erro ao deletar vaga.");
+    }
+  });
 
   const pageSize = 10;
   const paginatedJobs = jobs.slice(
@@ -31,51 +58,25 @@ export default function MuralDeVagas() {
   currentPage * pageSize
   );
 
-  //Estudar sobre react Query e SWR para refatorar e não ter mais necessidade de você criar manualmente os estados de loading, o array vazio inicial ([]), os blocos de try/catch e o useEffect
-  const fetchJobs = async() => {
-    try {
-      setLoading(true);
-      const data = await getJobs();
-      setJobs(data);
-    } catch {
-      message.error("Erro ao carregar as vagas.");
-    } finally {
-      setLoading(false);
-    }
+  const handleSearch = () => {
+    setActiveSearch(searchQuery.trim());
+    setCurrentPage(1);
   };
 
-  const handleDelete = async(jobId: number) => {
+  const handleDelete = (jobId: number) => {
     if(!isLoggedIn) {
-      message.warning("Você precisa estar logado para deletar uma vaga.");
+      message.warning("Você precisa está logado para deletar uma vaga.");
       return;
     }
-
-    try {
-      await deleteJob(jobId);
-      message.success("Vaga deletada com sucesso.");
-      fetchJobs(); 
-
-    } catch {
-      message.error("Erro ao deletar a vaga.");
-    }
+    deleteMutation.mutate(jobId);
   };
 
-  const handleSearch = async(query: string) => {
-    if(!query.trim()) {
-      fetchJobs();
+  const handleEdit = (postId: number) => {
+     if(!isLoggedIn) {
+      message.warning("Você precisa estar logado para editar uma vaga.");
       return;
     }
-
-    try {
-      setLoading(true);
-      const data = await search(query);
-      setJobs(data);
-
-    } catch {
-      message.error("Erro ao buscar vagas.");
-    } finally {
-      setLoading(false);
-    }
+    router.push(`/jobPost?postId=${postId}`);
   };
 
   const handleLogout = () => {
@@ -84,22 +85,11 @@ export default function MuralDeVagas() {
     router.push('/');
   };
 
-  const handleEdit = (postId: number) => {
-     if(!isLoggedIn) {
-      message.warning("Você precisa estar logado para editar uma vaga.");
-      return;
-    }
-    
-    router.push(`/jobPost?postId=${postId}`);
-  };
-
   useEffect(() => {
     const userData = localStorage.getItem('@jobpost:user');
     if(userData) {
       setIsLoggedIn(true);
     }
-
-    fetchJobs();
   }, []);
 
 
@@ -150,9 +140,9 @@ export default function MuralDeVagas() {
             className={styles.searchInput}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onPressEnter={() => handleSearch(searchQuery)}
+            onPressEnter={() => handleSearch()}
           />
-          <Button type="primary" size="large" className={styles.searchButton} onClick={() => handleSearch(searchQuery)}>
+          <Button type="primary" size="large" className={styles.searchButton} onClick={() => handleSearch()}>
             Buscar Vagas
           </Button>
         </section>
@@ -169,7 +159,7 @@ export default function MuralDeVagas() {
 
             {/* JOBCARDS */}
             <div className={styles.cardsContainer}>
-              {loading ? (
+              {isLoading ? (
                 <Text>Carregando vagas...</Text>
               ) : jobs.length === 0 ? (
                 <Text>Nenhuma vaga encontrada.</Text>

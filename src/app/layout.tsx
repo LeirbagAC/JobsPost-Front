@@ -1,5 +1,5 @@
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import AntdProvider from '@/providers/antd'; 
+import AppProviders from '@/providers/AppProviders';
 import '@/assets/css/globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -7,9 +7,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body>
         <AntdRegistry>
-          <AntdProvider>
+          <AppProviders>
             {children}
-          </AntdProvider>
+          </AppProviders>
         </AntdRegistry>
       </body>
     </html>

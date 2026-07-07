@@ -10,10 +10,14 @@ import {
   ArrowLeftOutlined,
 } from '@ant-design/icons';
 import styles from '@/assets/css/JobPost.module.css';
+
+import { JobPost } from '@/types';
+
 import { postJob, JobFormValues } from '@/service/JobsPost.service';
 import { editJob } from '@/service/editJob.service';
-import { JobPost } from '@/types';
 import { getJobById } from '@/service/getJobById.service';
+
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -21,76 +25,89 @@ const { TextArea } = Input;
 function JobPostClientPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingPostId, setEditingPostId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   const [form] = Form.useForm<JobFormValues>();
 
+  const postIdParam = searchParams.get('postId');
+  const postId = postIdParam ? Number(postIdParam): null;
+  const isEditing = !!postId && !Number.isNaN(postId); //!!postId = Esse valor existe ou tem valor sigficativo ?
+
+  const { data: jobData, isLoading: isLoadingJob } = useQuery({
+    queryKey: ['job', postId],
+    queryFn: () => getJobById(postId as number),
+    enabled: isEditing,
+
+    //Refatoração para usar os dados em cache para torna a busca de dados no edit mais rápida, antes dava para notar um pequeno delay agora parece automático 
+    initialData: () => { 
+      if(!postId) return undefined;
+
+      const jobCache = queryClient.getQueriesData<JobPost[]>({
+        queryKey: ['jobs']
+      });
+
+      for (const [jobKey, jobsFound] of jobCache) {
+        if (jobsFound) {
+          const jobFound = jobsFound.find(job => job.postId === postId);
+          if (jobFound) {
+            return jobFound; 
+          }
+        }
+      }
+
+      return undefined;
+    },
+  });
+
   useEffect(() => {
-    const postIdParam = searchParams.get('postId');
-
-    if (!postIdParam) {
-      setIsEditing(false);
-      setEditingPostId(null);
+    if (jobData) {
+      form.setFieldsValue({
+        title: jobData.postProfile,
+        postTechStack: jobData.postTechStack,
+        reqExperience: jobData.reqExperience,
+        description: jobData.postDesc,
+      });
+    } else if (!isEditing) {
       form.resetFields();
-      return;
     }
+  }, [jobData, isEditing, form]);
 
-    const postId = Number(postIdParam);
-
-    if (Number.isNaN(postId)) {
-      message.error('ID da vaga inválido.');
-      return;
-    }
-
-    const loadJobForEdit = async () => {
-      setLoading(true);
-      try {
-        const job = await getJobById(postId);
-        setEditingPostId(postId);
-        setIsEditing(true);
-        form.setFieldsValue({
-          title: job.postProfile,
-          postTechStack: job.postTechStack,
-          reqExperience: job.reqExperience,
-          description: job.postDesc,
-        });
-      } catch {
-        message.error('Erro ao carregar a vaga para edição.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void loadJobForEdit();
-  }, [form, searchParams]);
-
-  const handleSubmit = async (values: JobFormValues) => {
-    setLoading(true);
-    try {
-      if (isEditing && editingPostId !== null) {
-        const payload: JobPost = {
-          postId: editingPostId,
-          postProfile: values.title,
-          postTechStack: values.postTechStack,
-          reqExperience: values.reqExperience,
-          postDesc: values.description,
-        };
-
-        await editJob(editingPostId, payload);
-        message.success('Vaga atualizada com sucesso!');
-      } else {
-        await postJob(values);
-        message.success('Vaga publicada com sucesso!');
-      }
-
+  const createMutation = useMutation({
+    mutationFn: postJob,
+    onSuccess: () => {
+      message.success("Vaga criada com sucesso.");
+      queryClient.invalidateQueries({ queryKey:['jobs'] });
       router.push('/');
-    } catch {
-      message.error(isEditing ? 'Erro ao atualizar a vaga. Tente novamente.' : 'Erro ao publicar a vaga. Tente novamente.');
-    } finally {
-      setLoading(false);
+    },
+    onError: () => message.error("Erro ao criar vaga.")
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: JobPost }) => editJob(id, payload),
+    onSuccess: () => {
+      message.success('Vaga atualizada com sucesso!');
+      queryClient.invalidateQueries({ queryKey: ['jobs'] }); 
+      queryClient.invalidateQueries({ queryKey: ['job', postId] }); 
+      router.push('/');
+    },
+    onError: () => message.error('Erro ao atualizar.'),
+  });
+
+  const handleSubmit = (values: JobFormValues) => {
+    if (isEditing && postId !== null) {
+      const payload: JobPost = {
+        postId: postId,
+        postProfile: values.title,
+        postTechStack: values.postTechStack,
+        reqExperience: values.reqExperience,
+        postDesc: values.description,
+      };
+      updateMutation.mutate({ id: postId, payload });
+    } else {
+      createMutation.mutate(values);
     }
   };
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className={styles.pageWrapper}>
@@ -169,7 +186,7 @@ function JobPostClientPageContent() {
               <Button size="large" onClick={() => form.resetFields()}>
                 Limpar Campos
               </Button>
-              <Button type="primary" size="large" htmlType="submit" loading={loading}>
+              <Button type="primary" size="large" htmlType="submit" loading={isSubmitting}>
                 {isEditing ? 'Salvar Alterações' : 'Publicar Vaga'}
               </Button>
             </div>

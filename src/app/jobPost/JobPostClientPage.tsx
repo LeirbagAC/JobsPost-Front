@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card, Form, Input, Button, Select, Typography, Divider, message,
@@ -30,15 +30,15 @@ function JobPostClientPageContent() {
 
   const postIdParam = searchParams.get('postId');
   const postId = postIdParam ? Number(postIdParam): null;
-  const isEditing = !!postId && !Number.isNaN(postId); //!!postId = Esse valor existe ou tem valor sigficativo ?
+  const isEditing = !!postId && !Number.isNaN(postId); //!!postId = Esse valor existe ou tem valor sigficativo?
 
-  const { data: jobData, isLoading: isLoadingJob } = useQuery({
+  const { data: jobData } = useQuery({
     queryKey: ['job', postId],
     queryFn: () => getJobById(postId as number),
-    enabled: isEditing,
+    enabled: isEditing, //O enbled serve para que a query só seja executada se a condição for verdadeira, nesse caso, só vai buscar os dados se for edição
 
     //Refatoração para usar os dados em cache para torna a busca de dados no edit mais rápida, antes dava para notar um pequeno delay agora parece automático 
-    initialData: () => { 
+    initialData: () => { //A regra do initialData é essa: Se essa função retornar qualquer coisa que nào seja undefined, o React Query injeta esse dado no cache imediatamente, e o isLoading NUNCA se torna true
       if(!postId) return undefined;
 
       const jobCache = queryClient.getQueriesData<JobPost[]>({

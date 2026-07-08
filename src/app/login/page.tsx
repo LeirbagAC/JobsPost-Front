@@ -8,72 +8,86 @@ import {
 } from '@ant-design/icons';
 import styles from '@/assets/css/auth.module.css';
 import api from '@/service/api';
+
 import { getAuthTabItems } from './authTabs';
+
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 
 const { Title, Text } = Typography;
 
 export default function AuthPage() {
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab] = useState('login');
 
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
 
-  const router = useRouter();
-
-const onFinishLogin = async (values: any) => {
-  setLoading(true);
-  try {
-    const credentials = `${values.username}:${values.password}`;
-    
-    const base64Token = btoa(credentials);
-
-    const response = await api.get('/login', {
-      headers: {
-        Authorization: `Basic ${base64Token}`
+  // Serve para impedir que o usuário logado acesse a página de login ou registro novamente, redirecionando-o para a página inicial.
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
+    queryFn: () => {
+      const raw = localStorage.getItem('@jobpost:user');
+      if (raw) {
+        const user = JSON.parse(raw);
+        router.push('/'); 
+        return user;
       }
-    });
+      return null; 
+    },
+    staleTime: Infinity, 
+  });
 
-    localStorage.setItem('@jobpost:user', JSON.stringify({ 
-      token: base64Token, 
-      username: values.username 
-    }));
+  const loginMutation  = useMutation({
+    mutationFn: async (values:any) => {
+      const credentials = `${values.username}:${values.password}`;
+      const base64Token = btoa(credentials);
 
-    message.success('Login realizado com sucesso!');
-    router.push('/'); 
-    
-  } catch (error) {
-    console.error(error);
-    message.error('Falha na autenticação. Verifique se o nome de usuário e senha estão corretos.');
-  } finally {
-    setLoading(false);
-  }
-};
+      await api.get('/login', {
+        headers: {
+          authorization: `Basic ${base64Token}`
+        }
+      });
 
-  const onFinishRegister = async (values: any) => {
-    setLoading(true);
-    try {
-      await api.post('/register', {
+      return { token: base64Token, username: values.username };
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('@jobpost:user', JSON.stringify(data));
+      queryClient.setQueryData(['user'], data);
+
+      message.success('Login realizado com sucesso!');
+      router.push('/'); 
+    },
+    onError: (error) => {
+      console.error(error);
+      message.error('Falha na autenticação. Verifique se o nome de usuário e senha estão corretos.');
+    }
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async (values: any) => {
+        const response = await api.post('/register', {
         username: values.username,
         password: values.password
       });
-
+      return response.data;
+    },
+    onSuccess: () => {
       message.success('Conta criada com sucesso! Agora você pode fazer login.');
       registerForm.resetFields();
-    } catch (error: any) {
-      const erro = error.response?.data?.message || 'Erro ao criar conta. Tente novamente.';
-      message.error(erro);
-    } finally {
-      setLoading(false);
+      setActiveTab('login');
     }
-  };
+  });
+
+  const isGlobalLoadind = loginMutation.isPending || registerMutation.isPending;
 
   const tabItems = getAuthTabItems({
     loginForm,
     registerForm,
-    onFinishLogin,
-    onFinishRegister,
-    loading,
+    onFinishLogin: loginMutation.mutate,
+    onFinishRegister: registerMutation.mutate,
+    loading: isGlobalLoadind,
     styles,
   });
 

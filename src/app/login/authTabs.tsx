@@ -5,8 +5,8 @@ import type { TabsProps, FormInstance } from 'antd';
 interface AuthTabsProps {
   loginForm: FormInstance;
   registerForm: FormInstance;
-  onFinishLogin: (values: any) => Promise<void>;
-  onFinishRegister: (values: any) => Promise<void>;
+  onFinishLogin: (values: any) => void;
+  onFinishRegister: (values: any) => void;
   loading: boolean;
   styles: any; 
 }
